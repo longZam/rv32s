@@ -2,6 +2,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
+int __run_simulator(simulator_t* simulator)
+{
+    int exit_code;
+    while (!(exit_code = step_simulator(simulator)));
+    return exit_code - 1;
+}
+
 int main(int argc, char* argv[])
 {
     if (argc < 2)
@@ -15,7 +22,8 @@ int main(int argc, char* argv[])
     if (import_data_segment(simulator, argv[1]))
         return 1;
 
-    for (int i = 0; i < 1000000 && !step_simulator(simulator); i++);
+    if (__run_simulator(simulator))
+        return 1;
 
     if (export_data_segment(simulator, "data.out"))
         return 1;

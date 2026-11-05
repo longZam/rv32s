@@ -6,6 +6,7 @@
 
 typedef struct
 {
+    int32_t execution_counter;
     uint32_t program_counter;
     uint32_t instruction_register;
     uint32_t general_perpose_registers[32];

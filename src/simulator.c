@@ -3,9 +3,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define __TEXT_SEGMENT_OFFSET 0x00040000
 #define __DATA_SEGMENT_OFFSET 0x10000000
+#define __EXECUTION_LIMIT 1000000
 
 #pragma region inline
 
@@ -56,6 +58,9 @@ void destroy_simulator(simulator_t* ptr)
     free(ptr);
 }
 
+/**
+ * @return 0: 다음 명령 수행 가능, 1: 정상 종료, 2: 비정상 종료
+ */
 int step_simulator(simulator_t* simulator)
 {
     // fetch
@@ -65,16 +70,17 @@ int step_simulator(simulator_t* simulator)
     // decode
     __instruction_executor_fn executor = __decode(simulator->instruction_register);
 
+    if (__EXECUTION_LIMIT <= simulator->execution_counter)
+        return executor == NULL ? 1 : 2;
+
+    simulator->execution_counter += 1;
+
     // execute
     return executor != NULL ? executor(simulator) : 1;
 }
 
 int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t* dst_ptr)
 {
-    // check alignment
-    if (src_addr % sizeof(uint32_t) != 0)
-        return 1;
-
     // in data segment
     if (__DATA_SEGMENT_OFFSET < src_addr)
     {
@@ -130,6 +136,8 @@ int import_text_segment(simulator_t* simulator, const char* filename)
 
 int import_data_segment(simulator_t* simulator, const char* filename)
 {
+    memset(simulator->data_segment, 0, DATA_SEGMENT_SIZE);
+
     FILE* fp = fopen(filename, "rb");
 
     if (fp == NULL)
