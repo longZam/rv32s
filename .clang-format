@@ -1,0 +1,23 @@
+Language: C
+BasedOnStyle: Google
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 0
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Custom
+IncludeBlocks: Merge
+InsertNewlineAtEOF: true
+BraceWrapping:
+  AfterClass: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterUnion: true
+  AfterFunction: true
+  AfterControlStatement: Always
+  BeforeElse: true
+  BeforeCatch: true
+  BeforeLambdaBody: true
+  SplitEmptyFunction: true
+  SplitEmptyRecord: true
+  SplitEmptyNamespace: true
+  IndentBraces: false

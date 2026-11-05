@@ -1,0 +1,9 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-community/features/llvm:3": {
+      "version": "3.2.0",
+      "resolved": "ghcr.io/devcontainers-community/features/llvm@sha256:4f464ab97a59439286a55490b55ba9851616f6f76ac3025e134127ac08ad79e2",
+      "integrity": "sha256:4f464ab97a59439286a55490b55ba9851616f6f76ac3025e134127ac08ad79e2"
+    }
+  }
+}
