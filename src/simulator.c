@@ -79,7 +79,7 @@ int step_simulator(simulator_t* simulator)
 int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t* dst_ptr)
 {
     // in data segment
-    if (__DATA_SEGMENT_OFFSET < src_addr)
+    if (__DATA_SEGMENT_OFFSET <= src_addr)
     {
         src_addr -= __DATA_SEGMENT_OFFSET;
 
@@ -90,7 +90,7 @@ int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t*
         return 1;
     }
     // in text segment
-    else if (__TEXT_SEGMENT_OFFSET < src_addr)
+    else if (__TEXT_SEGMENT_OFFSET <= src_addr)
     {
         src_addr -= __TEXT_SEGMENT_OFFSET;
 
