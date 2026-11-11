@@ -125,6 +125,9 @@ __instruction_executor_fn __decode(uint32_t instruction)
             }
             break;
 
+        case 0x37:
+            return __lui;
+
         case 0x63:
             switch (funct3)
             {
