@@ -23,6 +23,8 @@ int step_simulator(simulator_t* simulator);
 
 int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t* dst_ptr);
 
+int try_write_word_simulator(simulator_t* simulator, uint32_t src_word, uint32_t dst_addr);
+
 int import_text_segment(simulator_t* simulator, const char* filename);
 
 int import_data_segment(simulator_t* simulator, const char* filename);

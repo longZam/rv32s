@@ -31,6 +31,14 @@ static inline uint32_t __read_uint32_little_endian(const uint8_t* buffer)
     return (uint32_t)buffer[0] | ((uint32_t)buffer[1] << 8) | ((uint32_t)buffer[2] << 16) | ((uint32_t)buffer[3] << 24);
 }
 
+static inline void __write_uint32_little_endian(uint8_t* buffer, uint32_t value)
+{
+    buffer[0] = (uint8_t)(value & 0xFF);
+    buffer[1] = (uint8_t)((value >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((value >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((value >> 24) & 0xFF);
+}
+
 #pragma endregion
 
 typedef int (*__instruction_executor_fn)(simulator_t* simulator);
@@ -197,6 +205,23 @@ int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t*
             return 0;
 
         *dst_ptr = __read_uint32_little_endian(simulator->text_segment + src_addr);
+        return 1;
+    }
+    else
+        return 0;
+}
+
+int try_write_word_simulator(simulator_t* simulator, uint32_t src_word, uint32_t dst_addr)
+{
+    // in data segment
+    if (__DATA_SEGMENT_OFFSET <= dst_addr)
+    {
+        dst_addr -= __DATA_SEGMENT_OFFSET;
+
+        if (DATA_SEGMENT_SIZE < dst_addr + sizeof(uint32_t))
+            return 0;
+
+        __write_uint32_little_endian(simulator->data_segment + dst_addr, src_word);
         return 1;
     }
     else
