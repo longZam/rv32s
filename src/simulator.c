@@ -115,7 +115,7 @@ int import_text_segment(simulator_t* simulator, const char* filename)
     size_t bytes_read;
 
     // until EOF
-    while ((bytes_read = fread(simulator->data_segment + total_read,
+    while ((bytes_read = fread(simulator->text_segment + total_read,
                                sizeof(uint8_t),
                                TEXT_SEGMENT_SIZE - total_read,
                                fp)) > 0)
