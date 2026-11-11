@@ -37,7 +37,106 @@ typedef int (*__instruction_executor_fn)(simulator_t* simulator);
 
 __instruction_executor_fn __decode(uint32_t instruction)
 {
-    // TODO: implement finding executor
+    uint32_t opcode = __get_opcode(instruction);
+    uint32_t funct3 = __get_funct3(instruction);
+    uint32_t funct7 = __get_funct7(instruction);
+
+    switch (opcode)
+    {
+        case 0x03:
+            switch (funct3)
+            {
+                case 0x2:
+                    return __lw;
+                default:
+                    break;
+            }
+            break;
+
+        case 0x23:
+            switch (funct3)
+            {
+                case 0x2:
+                    return __sw;
+                default:
+                    break;
+            }
+            break;
+
+        case 0x13:
+            switch (funct3)
+            {
+                case 0x0:
+                    return __addi;
+                case 0x6:
+                    return __ori;
+                case 0x7:
+                    return __andi;
+                default:
+                    break;
+            }
+            break;
+
+        case 0x33:
+            switch (funct3)
+            {
+                case 0x0:
+                    switch (funct7)
+                    {
+                        case 0x00:
+                            return __add;
+                        case 0x20:
+                            return __sub;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case 0x6:
+                    switch (funct7)
+                    {
+                        case 0x00:
+                            return __or;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case 0x7:
+                    switch (funct7)
+                    {
+                        case 0x00:
+                            return __and;
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+
+        case 0x63:
+            switch (funct3)
+            {
+                case 0x0:
+                    return __beq;
+                case 0x1:
+                    return __bne;
+                case 0x4:
+                    return __blt;
+                case 0x5:
+                    return __bge;
+                default:
+                    break;
+            }
+            break;
+
+        default:
+            break;
+    }
+
     return NULL;
 }
 
