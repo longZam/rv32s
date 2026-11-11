@@ -58,25 +58,22 @@ void destroy_simulator(simulator_t* ptr)
     free(ptr);
 }
 
-/**
- * @return 0: 다음 명령 수행 가능, 1: 정상 종료, 2: 비정상 종료
- */
 int step_simulator(simulator_t* simulator)
 {
     // fetch
-    if (try_read_word_simulator(simulator, simulator->program_counter, &simulator->instruction_register))
-        return 1;
+    if (!try_read_word_simulator(simulator, simulator->program_counter, &simulator->instruction_register))
+        return 0;
 
     // decode
     __instruction_executor_fn executor = __decode(simulator->instruction_register);
 
     if (__EXECUTION_LIMIT <= simulator->execution_counter)
-        return executor == NULL ? 1 : 2;
+        return 0;
 
     simulator->execution_counter += 1;
 
     // execute
-    return executor != NULL ? executor(simulator) : 1;
+    return executor != NULL ? executor(simulator) : 0;
 }
 
 int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t* dst_ptr)
@@ -87,10 +84,10 @@ int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t*
         src_addr -= __DATA_SEGMENT_OFFSET;
 
         if (DATA_SEGMENT_SIZE < src_addr + sizeof(uint32_t))
-            return 1;
+            return 0;
 
         *dst_ptr = __read_uint32_little_endian(simulator->data_segment + src_addr);
-        return 0;
+        return 1;
     }
     // in text segment
     else if (__TEXT_SEGMENT_OFFSET < src_addr)
@@ -98,13 +95,13 @@ int try_read_word_simulator(simulator_t* simulator, uint32_t src_addr, uint32_t*
         src_addr -= __TEXT_SEGMENT_OFFSET;
 
         if (TEXT_SEGMENT_SIZE < src_addr + sizeof(uint32_t))
-            return 1;
+            return 0;
 
         *dst_ptr = __read_uint32_little_endian(simulator->text_segment + src_addr);
-        return 0;
+        return 1;
     }
     else
-        return 1;
+        return 0;
 }
 
 int import_text_segment(simulator_t* simulator, const char* filename)
@@ -112,7 +109,7 @@ int import_text_segment(simulator_t* simulator, const char* filename)
     FILE* fp = fopen(filename, "rb");
 
     if (fp == NULL)
-        return 1;
+        return 0;
 
     size_t total_read = 0;
     size_t bytes_read;
@@ -129,9 +126,9 @@ int import_text_segment(simulator_t* simulator, const char* filename)
             break;
     }
 
-    int failure = feof(fp);
+    int success = feof(fp);
     fclose(fp);
-    return failure;
+    return success;
 }
 
 int import_data_segment(simulator_t* simulator, const char* filename)
@@ -141,7 +138,7 @@ int import_data_segment(simulator_t* simulator, const char* filename)
     FILE* fp = fopen(filename, "rb");
 
     if (fp == NULL)
-        return 1;
+        return 0;
 
     size_t total_read = 0;
     size_t bytes_read;
@@ -158,9 +155,9 @@ int import_data_segment(simulator_t* simulator, const char* filename)
             break;
     }
 
-    int failure = feof(fp);
+    int success = feof(fp);
     fclose(fp);
-    return failure;
+    return success;
 }
 
 int export_data_segment(simulator_t* simulator, const char* filename)
@@ -168,7 +165,7 @@ int export_data_segment(simulator_t* simulator, const char* filename)
     FILE* fp = fopen(filename, "wb");
 
     if (fp == NULL)
-        return 1;
+        return 0;
 
     size_t total_written = 0;
 
@@ -186,5 +183,5 @@ int export_data_segment(simulator_t* simulator, const char* filename)
     }
 
     fclose(fp);
-    return total_written != DATA_SEGMENT_SIZE;
+    return total_written == DATA_SEGMENT_SIZE;
 }
