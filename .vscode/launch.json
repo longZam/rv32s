@@ -1,0 +1,60 @@
+{
+    "inputs": [
+        {
+            "id": "text.bin",
+            "type": "command",
+            "command": "extension.commandvariable.file.pickFile",
+            "args": {
+                "include": "**/text.bin",
+                "exclude": "**/build/**",
+                "display": "fileName",
+                "description": "프로그램의 입력으로 사용할 Text Segment 파일을 선택하세요."
+            }
+        },
+        {
+            "id": "data.bin",
+            "type": "command",
+            "command": "extension.commandvariable.file.pickFile",
+            "args": {
+                "include": "**/data.bin",
+                "exclude": "**/build/**",
+                "display": "fileName",
+                "description": "프로그램의 입력으로 사용할 Data Segment 파일을 선택하세요."
+            }
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Run and Debug rv32s",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/program",
+            "args": [
+                "${input:text.bin}",
+                "${input:data.bin}"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "CMake: 빌드",
+            "setupCommands": [
+                {
+                    "description": "gdb에 자동 서식 지정 사용",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "디스어셈블리 버전을 Intel(으)로 설정",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                },
+                {
+                    "text": "source ${workspaceFolder}/.vscode/rv32i_gdb.py",
+                    "ignoreFailures": true
+                }
+            ],
+        }
+    ]
+}

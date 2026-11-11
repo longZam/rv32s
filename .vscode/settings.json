@@ -3,5 +3,7 @@
         "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd"
     },
     "C_Cpp.formatting": "disabled",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "cmake.configureOnOpen": true,
+    "cmake.useCMakePresets": "never"
 }
