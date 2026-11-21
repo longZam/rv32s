@@ -34,22 +34,22 @@ typedef int (*__comparer_fn)(uint32_t a, uint32_t b);
 
 int __compare_greater_or_equal(uint32_t a, uint32_t b)
 {
-    return a >= b;
+    return (int32_t)a >= (int32_t)b;
 }
 
 int __compare_less(uint32_t a, uint32_t b)
 {
-    return a < b;
+    return (int32_t)a < (int32_t)b;
 }
 
 int __compare_equal(uint32_t a, uint32_t b)
 {
-    return a == b;
+    return (int32_t)a == (int32_t)b;
 }
 
 int __compare_not_equal(uint32_t a, uint32_t b)
 {
-    return a != b;
+    return (int32_t)a != (int32_t)b;
 }
 
 static inline int __branch(simulator_t* simulator, __comparer_fn comparer)
