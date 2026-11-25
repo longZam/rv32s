@@ -238,22 +238,15 @@ int import_text_segment(simulator_t* simulator, const char* filename)
     if (fp == NULL)
         return 0;
 
-    size_t total_read = 0;
-    size_t bytes_read;
+    size_t n = fread(simulator->text_segment, 1, TEXT_SEGMENT_SIZE, fp);
 
-    // until EOF
-    while ((bytes_read = fread(simulator->text_segment + total_read,
-                               sizeof(uint8_t),
-                               TEXT_SEGMENT_SIZE - total_read,
-                               fp)) > 0)
+    if (ferror(fp))
     {
-        total_read += bytes_read;
-
-        if (TEXT_SEGMENT_SIZE <= total_read)
-            break;
+        fclose(fp);
+        return 0;
     }
 
-    int success = feof(fp);
+    int success = fgetc(fp) == EOF;
     fclose(fp);
     return success;
 }
@@ -267,22 +260,15 @@ int import_data_segment(simulator_t* simulator, const char* filename)
     if (fp == NULL)
         return 0;
 
-    size_t total_read = 0;
-    size_t bytes_read;
+    size_t n = fread(simulator->data_segment, 1, DATA_SEGMENT_SIZE, fp);
 
-    // until EOF
-    while ((bytes_read = fread(simulator->data_segment + total_read,
-                               sizeof(uint8_t),
-                               DATA_SEGMENT_SIZE - total_read,
-                               fp)) > 0)
+    if (ferror(fp))
     {
-        total_read += bytes_read;
-
-        if (DATA_SEGMENT_SIZE <= total_read)
-            break;
+        fclose(fp);
+        return 0;
     }
 
-    int success = feof(fp);
+    int success = fgetc(fp) == EOF;
     fclose(fp);
     return success;
 }
@@ -294,21 +280,7 @@ int export_data_segment(simulator_t* simulator, const char* filename)
     if (fp == NULL)
         return 0;
 
-    size_t total_written = 0;
-
-    while (total_written < DATA_SEGMENT_SIZE)
-    {
-        size_t written = fwrite(simulator->data_segment + total_written,
-                                sizeof(uint8_t),
-                                DATA_SEGMENT_SIZE - total_written,
-                                fp);
-
-        total_written += written;
-
-        if (written == 0)
-            break;
-    }
-
+    size_t n = fwrite(simulator->data_segment, 1, DATA_SEGMENT_SIZE, fp);
     fclose(fp);
-    return total_written == DATA_SEGMENT_SIZE;
+    return n == DATA_SEGMENT_SIZE;
 }
