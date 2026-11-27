@@ -1,0 +1,1 @@
+lw little-endian 읽기, sw 오프셋 확인 (x1 = 0x12345678)

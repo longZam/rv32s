@@ -1,0 +1,1 @@
+addi 음수 즉시값 부호 확장, lui로 data 주소 생성, sw 4바이트 쓰기, invalid 종료
