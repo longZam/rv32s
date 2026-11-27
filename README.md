@@ -2,18 +2,55 @@
 
 지정된 RISC-V RV32I 명령어 14개를 실행하는 기능(ISA 수준) 시뮬레이터입니다.
 
+## 0. 팀원
+
+팀 08
+
+| 이름 | 학과 | 학번 |
+|------|------|------|
+| 권서림 | 정보보안암호수학과 | 20232073 |
+| 권동욱 | 소프트웨어학부 | 20233019 |
+| 송지민 | 인공지능학부 | 20243157 |
+| 최승욱 | 소프트웨어학부 | 20223150 |
+
+
 ## 1. 개발 환경
 
 | 항목 | 내용 |
 |------|------|
-| 언어 | C |
-| OS | [Ubuntu 24.04] 에서 실행 확인 |
-| 외부 의존성 | 표준 라이브러리 |
+| 언어 | C(C11),gcc 15.2.0(Ubuntu 26.04.1 기준) |
+| 빌드 도구 | CMake 4.2.3(Ubuntu 26.04.1 기준) |
+| OS | Ubuntu 24.04, Ubuntu 26.04.1(WSL) 에서 빌드 및 테스트 확인 |
+| 외부 의존성 | C 표준 라이브러리, POSIX `<sysexits.h>`(종료 코드) |
+
 ---
 
 ### Dev Container
 
 이 저장소에는 `.devcontainer/` 설정이 포함되어 있어, Visual Studio Code의 Dev Containers로 열면 빌드 환경(컴파일러, CMake 등)이 자동으로 준비됩니다.
+
+### 파일 배치
+
+```
+rv32s/
+|-- CMakeLists.txt        빌드 설정 (src/ 아래 .c 파일을 모아 program 실행 파일 생성)
+|-- README.md
+|-- include/
+|   |-- simulator.h       시뮬레이터 구조체 정의와 함수 선언
+|   `-- executors.h       명령어별 실행 함수(__add, __sw 등) 선언
+|-- src/
+|   |-- main.c            프로그램 시작점: 입력 파일 읽기, 실행, 결과 출력
+|   |-- simulator.c       명령어 fetch, 해독, 실행 루프와 메모리 읽기/쓰기
+|   `-- executors/
+|       |-- r-format.c    add, sub, and, or
+|       |-- i-format.c    addi, andi, ori, lw
+|       |-- s-format.c    sw
+|       |-- sb-format.c   beq, bne, blt, bge
+|       `-- u-format.c    lui
+`-- tests/
+    |-- run_tests.sh      전체 테스트 실행 스크립트
+    `-- t01 ~ t09 폴더    각 테스트의 text.bin, data.bin, 기대 출력
+```   
 
 ## 2. 빌드
 
@@ -86,8 +123,8 @@ PC 0x00040014 invalid instruction 0x00000000
 ### 종료 조건
 
 1. 지원하지 않는 명령어가 fetch되면 **실행하지 않고** 종료 처리 (표준 출력 + `data.out` 저장)
-2. 1,000,000개 실행 후 다음 fetch가 invalid이면 정상 종료
-3. 1,000,000개 실행 후 다음 fetch가 지원 명령어이면 실행하지 않고 실행 한도 초과로 비정상 종료
+2. 1,000,000개 실행 후 다음 fetch가 invalid이면 그대로 종료 처리
+3. 1,000,000개 실행 후 다음 fetch가 지원 명령어여도 실행하지 않고 같은 형식으로 출력 후 종료 (종료 코드 0)
 
 ## 5. 테스트
 
@@ -98,6 +135,7 @@ PC 0x00040014 invalid instruction 0x00000000
 ```
 
 각 테스트 폴더의 `text.bin`, `data.bin`으로 시뮬레이터를 실행한 뒤, 표준 출력과 `data.out`을 기대 결과와 비교합니다.
+82개의 보조 테스트는 참조 실행기로 만든 것이며, 테스트 보조용으로만 사용했습니다. 자세한 내용은 보고서 11.에 기록했습니다.
 
 ### 포함된 테스트 항목
 
@@ -105,7 +143,7 @@ PC 0x00040014 invalid instruction 0x00000000
 |--------|------|
 | `t01_basic_and_store` | 기본 연산과 메모리 쓰기 |
 | `t02_randomized_1` | 무작위로 생성된 명령어 시퀀스 1 |
-| `t03_randomzied_2` | 무작위로 생성된 명령어 시퀀스 2 |
+| `t03_randomized_2` | 무작위로 생성된 명령어 시퀀스 2 |
 | `t04_invalid_ffffffff` | 정의되지 않은 명령어 종료 처리 |
 | `t05_backward_signed_branch` | 음수 방향 분기 처리 |
 | `t06_negimm_lui_sw` | addi 음수 즉시값 부호 확장, lui로 data 주소 생성, sw 4바이트 쓰기, invalid 종료 |
