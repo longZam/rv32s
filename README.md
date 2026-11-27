@@ -9,10 +9,7 @@
 | 언어 | C |
 | OS | [Ubuntu 24.04] 에서 실행 확인 |
 | 외부 의존성 | 표준 라이브러리 |
-| 참조 실행기 | 사용 안 함 |
 ---
-
-네트워크·AI 서비스·대화형 입력에 의존하지 않습니다.
 
 ### Dev Container
 
@@ -52,15 +49,13 @@ cmake --build build
 
 ### 출력 형식
 
-**표준 출력** (한 줄, 줄바꿈 포함, 소문자 8자리 16진수):
+**표준 출력**:
 
 ```
 PC 0x00040014 invalid instruction 0x00000000
 ```
 
-- PC는 invalid 명령어를 **fetch한 시점의 주소**이며 PC+4가 아닙니다.
-
-**data.out**: `0x10000000` ~ `0x100003FF` 의 1,024 바이트를 주소 순서대로 저장한 바이너리 파일 (헤더·공백·줄바꿈 없음)
+**data.out**: `0x10000000` - `0x100003FF` 의 1,024 바이트를 주소 순서대로 저장한 바이너리 파일
 
 ---
 
@@ -82,7 +77,7 @@ PC 0x00040014 invalid instruction 0x00000000
 
 | 항목 | 값 |
 |------|----|
-| 레지스터 | x0~x31 (32비트), x0은 항상 0, 초기값 전부 0 |
+| 레지스터 | x0-x31 (32비트), x0은 항상 0, 초기값 전부 0 |
 | 초기 PC / text 시작 | `0x00040000` |
 | data 시작 | `0x10000000` (1,024 바이트) |
 | 바이트 순서 | little-endian |
@@ -99,7 +94,7 @@ PC 0x00040014 invalid instruction 0x00000000
 ### 전체 테스트 실행
 
 ```bash
-bash tests/run_tests.sh
+./tests/run_tests.sh
 ```
 
 각 테스트 폴더의 `text.bin`, `data.bin`으로 시뮬레이터를 실행한 뒤, 표준 출력과 `data.out`을 기대 결과와 비교합니다.
@@ -113,6 +108,10 @@ bash tests/run_tests.sh
 | `t03_randomzied_2` | 무작위로 생성된 명령어 시퀀스 2 |
 | `t04_invalid_ffffffff` | 정의되지 않은 명령어 종료 처리 |
 | `t05_backward_signed_branch` | 음수 방향 분기 처리 |
+| `t06_negimm_lui_sw` | addi 음수 즉시값 부호 확장, lui로 data 주소 생성, sw 4바이트 쓰기, invalid 종료 |
+| `t07_x0_write_ignored` | x0 쓰기 무시 확인 (구현 오류 시 data 앞 4바이트가 01 00 00 00) |
+| `t08_text_1024bytes` | text.bin이 정확히 1024바이트일 때의 입력 경계 조건 (수정 전 실패) |
+| `t09_lw_sw_offset` | lw little-endian 읽기, sw 오프셋 확인 (x1 = 0x12345678) |
 
 ## 6. 알려진 제한사항
 
